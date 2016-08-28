@@ -2,10 +2,10 @@
 import pika
 import numpy as np
 import cv2
+import cv
 def register(img1, img2):
 	print ("got em both")
-	print img1
-	print img2
+	print cv.phaseCorrelate(img1, img2)
 connection = pika.BlockingConnection(pika.ConnectionParameters(
         host='localhost'))
 channel = connection.channel()
@@ -21,7 +21,6 @@ def callback(ch, method, properties, body):
 	global img1, img2, lock
 	nparr = np.fromstring(body, np.uint8)
 	img_np = cv2.imdecode(nparr, cv2.CV_LOAD_IMAGE_COLOR)
-	print nparr
 	while lock == True:
 		time.sleep(1)
 
@@ -31,7 +30,7 @@ def callback(ch, method, properties, body):
 		img1 = img_np
 	elif img2 is None:
 		img2 = img_np
-	print "img 1 %r img 2 %r" % (img1, img2)
+	print "img 1 %r img 2 %r" % (img1 is None, img2 is None)
 	if not(img1 is None or img2 is None):
 		register(img1, img2)
 
