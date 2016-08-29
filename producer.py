@@ -2,7 +2,6 @@
 
 import pika
 import sys
-import cv2
 
 if len(sys.argv) < 4:
 	print "Not enough arguments!"
@@ -17,7 +16,7 @@ with open(dir1, "rb") as imageFile:
   img1 = bytearray(f)
 
 dir2 = sys.argv[2]
-with open(dir1, "rb") as imageFile:
+with open(dir2, "rb") as imageFile:
   f = imageFile.read()
   img2 = bytearray(f)
 
@@ -39,7 +38,7 @@ except pika.exceptions.ConnectionClosed:
 channel = connection.channel()
 
 channel.queue_declare(queue='img')
-# channel.queue_declare(queue='dir')
+channel.queue_declare(queue='dir')
 
 channel.basic_publish(exchange='',
                       routing_key='img',
@@ -51,10 +50,10 @@ channel.basic_publish(exchange='',
                       body=str(img2),
                       properties = pika.BasicProperties(content_type='image'))
 
-# channel.basic_publish(exchange='',
-#                       routing_key='dir',
-#                       body=result_dir,
-#                       properties = pika.BasicProperties(content_type='image'))
+channel.basic_publish(exchange='',
+                      routing_key='dir',
+                      body=result_dir,
+                      properties = pika.BasicProperties(content_type='image'))
 
 print("Sent messages successfully'")
 connection.close()
